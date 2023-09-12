@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { LoremIpsum } from 'lorem-ipsum';
 	import { onMount } from 'svelte';
 	import { spring } from 'svelte/motion';
 
@@ -79,7 +80,7 @@
 						top: activeSpaceRect.top - arenaRect.top,
 						left: activeSpaceRect.left - arenaRect.left,
 						width: activeSpaceRect.width,
-						height: activeSpaceRect.height
+						height: '100%'
 					}
 					//{ soft: true }
 				);
@@ -97,12 +98,24 @@
 		};
 	});
 
-	let words: string[][] = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`
+	const lorem = new LoremIpsum({
+		sentencesPerParagraph: {
+			max: 8,
+			min: 4
+		},
+		wordsPerSentence: {
+			max: 16,
+			min: 4
+		}
+	});
+
+	let words: string[][] = lorem
+		.generateSentences(2)
 		.split(' ')
 		.map((word) => word.split(''));
 </script>
 
-<div class="w-[700px] mx-auto flex flex-col items-start justify-center flex-grow">
+<div class="w-[800px] mx-auto flex flex-col items-start justify-center">
 	<div class="arena z-0 relative mb-24">
 		<input
 			type="text"
@@ -114,7 +127,7 @@
 		/>
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
-			class="flex flex-wrap select-none border-transparent peer-focus:border-slate-300 p-4 border-2 text-xl"
+			class=" gap-0 flex justify-start items-start flex-wrap select-none border-transparent border-black p-4 border-2 text-xl"
 			on:click={(e) => myInput.focus()}
 			on:keydown={(e) => myInput.focus()}
 		>
@@ -149,34 +162,46 @@
 				<span class="space my-1.5 w-2" />
 			{/each}
 		</div>
+
 		<div
-			class="absolute rounded-sm bg-blue-500/20"
+			class="absolute rounded-sm bg-black/10 peer-focus:bg-black/20"
 			style:top={`${$animatedCursorRect?.top}px`}
 			style:color="limegreen"
 			style:left={`${$animatedCursorRect?.left}px`}
 			style:width={`${$animatedCursorRect?.width}px`}
-			style:height={`${$animatedCursorRect?.height}px`}
+			style:height={`${$animatedCursorRect?.height ?? 2}px`}
 		/>
+		<button
+			class="border-2 border-black -translate-y-0.5 px-3 py-1"
+			on:click={(e) => {
+				keystrokes = [];
+				words = lorem
+					.generateSentences(2)
+
+					.split(' ')
+					.map((word) => word.split(''));
+			}}>Restart</button
+		>
 	</div>
 </div>
 
 <style>
 	.correct {
-		@apply text-green-500;
+		@apply text-emerald-500;
 	}
 
 	.incorrect {
-		@apply text-red-500;
+		@apply text-rose-700;
 	}
 
 	.extra {
-		@apply text-red-800;
+		@apply text-rose-700;
 	}
 
 	.word {
 		@apply block my-1;
 	}
 	.error {
-		@apply underline decoration-red-500;
+		@apply underline decoration-rose-500;
 	}
 </style>
