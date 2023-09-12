@@ -2,10 +2,9 @@
 	import '../app.css';
 </script>
 
-<div class="flex flex-col h-screen">
-	<nav>
-		<h1 class="font-bold">Welcome to SvelteKit</h1>
+<div class="flex flex-col w-[800px] mx-auto px-2 h-screen">
+	<nav class="py-2">
+		<h1 class="text-4xl font-bold">WPM Monster</h1>
 	</nav>
 	<slot />
-	<footer>Footer</footer>
 </div>

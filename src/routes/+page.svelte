@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { spring } from 'svelte/motion';
 
 	let myInput: HTMLInputElement;
 
@@ -37,7 +38,13 @@
 		return a.length === b.length && a.every((A, i) => A === b.at(i));
 	}
 
-	let cursorRect: DOMRect | undefined;
+	let animatedCursorRect: any = spring(
+		{ top: 0, left: 0, width: 0, height: 0 },
+		{
+			stiffness: 0.1,
+			damping: 0.5
+		}
+	);
 
 	onMount(() => {
 		function move() {
@@ -50,26 +57,32 @@
 				?.getBoundingClientRect();
 
 			if (activeLetterRect) {
-				cursorRect = {
-					...activeLetterRect,
-					top: activeLetterRect.top - arenaRect.top,
-					left: activeLetterRect.left - arenaRect.left,
-					width: activeLetterRect.width,
-					height: activeLetterRect.height
-				};
+				animatedCursorRect.set(
+					{
+						...activeLetterRect,
+						top: activeLetterRect.top - arenaRect.top,
+						left: activeLetterRect.left - arenaRect.left,
+						width: activeLetterRect.width,
+						height: activeLetterRect.height
+					}
+					//{ soft: true }
+				);
 				return;
 			}
 			const activeSpaceRect = document.querySelector('.active ~ .space')?.getBoundingClientRect();
 
-			console.log(activeSpaceRect);
+			//console.log(activeSpaceRect);
 			if (activeSpaceRect) {
-				cursorRect = {
-					...activeSpaceRect,
-					top: activeSpaceRect.top - arenaRect.top,
-					left: activeSpaceRect.left - arenaRect.left,
-					width: activeSpaceRect.width,
-					height: activeSpaceRect.height
-				};
+				animatedCursorRect.set(
+					{
+						...activeSpaceRect,
+						top: activeSpaceRect.top - arenaRect.top,
+						left: activeSpaceRect.left - arenaRect.left,
+						width: activeSpaceRect.width,
+						height: activeSpaceRect.height
+					}
+					//{ soft: true }
+				);
 				return;
 			}
 		}
@@ -90,7 +103,7 @@
 </script>
 
 <div class="w-[700px] mx-auto flex flex-col items-start justify-center flex-grow">
-	<div class="arena z-0 relative">
+	<div class="arena z-0 relative mb-24">
 		<input
 			type="text"
 			class="peer opacity-0"
@@ -136,14 +149,13 @@
 				<span class="space my-1.5 w-2" />
 			{/each}
 		</div>
-		<!-- {JSON.stringify({ cursorRect })} -->
 		<div
 			class="absolute rounded-sm bg-blue-500/20"
-			style:top={`${cursorRect?.top}px`}
+			style:top={`${$animatedCursorRect?.top}px`}
 			style:color="limegreen"
-			style:left={`${cursorRect?.left}px`}
-			style:width={`${cursorRect?.width}px`}
-			style:height={`${cursorRect?.height}px`}
+			style:left={`${$animatedCursorRect?.left}px`}
+			style:width={`${$animatedCursorRect?.width}px`}
+			style:height={`${$animatedCursorRect?.height}px`}
 		/>
 	</div>
 </div>
